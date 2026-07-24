@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sky CRM</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              border: "hsl(0 0% 90%)",
+              input: "hsl(0 0% 90%)",
+              ring: "hsl(0 0% 3.9%)",
+              background: "hsl(0 0% 100%)",
+              foreground: "hsl(0 0% 3.9%)",
+              primary: {
+                DEFAULT: "hsl(0 0% 3.9%)",
+                foreground: "hsl(0 0% 98%)",
+              },
+              secondary: {
+                DEFAULT: "hsl(0 0% 96.1%)",
+                foreground: "hsl(0 0% 9%)",
+              },
+              destructive: {
+                DEFAULT: "hsl(0 84.2% 60.2%)",
+                foreground: "hsl(0 0% 98%)",
+              },
+              muted: {
+                DEFAULT: "hsl(0 0% 96.1%)",
+                foreground: "hsl(0 0% 45.1%)",
+              },
+              accent: {
+                DEFAULT: "hsl(0 0% 96.1%)",
+                foreground: "hsl(0 0% 9%)",
+              },
+              popover: {
+                DEFAULT: "hsl(0 0% 100%)",
+                foreground: "hsl(0 0% 3.9%)",
+              },
+              card: {
+                DEFAULT: "hsl(0 0% 100%)",
+                foreground: "hsl(0 0% 3.9%)",
+              },
+            },
+            borderRadius: {
+              lg: `0.5rem`,
+              md: `calc(0.5rem - 2px)`,
+              sm: `calc(0.5rem - 4px)`,
+            },
+          }
+        }
+      }
+    </script>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.1.1",
+    "react-dom/": "https://aistudiocdn.com/react-dom@^19.1.1/",
+    "react/": "https://aistudiocdn.com/react@^19.1.1/",
+    "lucide-react": "https://aistudiocdn.com/lucide-react@^0.544.0",
+    "recharts": "https://aistudiocdn.com/recharts@^3.2.1"
+  }
+}
+</script>
+<link rel="stylesheet" href="/index.css">
+</head>
+  <body class="bg-secondary/40 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
