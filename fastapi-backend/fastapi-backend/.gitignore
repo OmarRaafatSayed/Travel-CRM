@@ -1,0 +1,38 @@
+# ============================================================
+# SECRET FILES - NEVER COMMIT THESE
+# ============================================================
+.env
+.env.local
+.env.development
+.env.production
+.env.staging
+.env.test
+*.env
+.env.*
+
+# Keep only the example template
+!.env.example
+
+# ============================================================
+# Python
+# ============================================================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+dist/
+build/
+*.so
+.venv/
+venv/
+env/
+ENV/
+
+# ============================================================
+# Logs & temp files
+# ============================================================
+*.log
+*.tmp

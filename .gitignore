@@ -1,0 +1,93 @@
+# =============================================================================
+# Travel Agency CRM — .gitignore
+# =============================================================================
+
+# ── Secrets (NEVER commit these) ─────────────────────────────────────────────
+.env
+.env.local
+.env.development
+.env.staging
+.env.test
+.env.production
+*.env
+.env.*
+!.env.example
+
+# ── Node / Frontend ───────────────────────────────────────────────────────────
+node_modules/
+dist/
+build/
+.cache/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnp.*
+.yarn/
+
+# ── Python / FastAPI ──────────────────────────────────────────────────────────
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+.eggs/
+*.so
+.venv/
+venv/
+env/
+ENV/
+.python-version
+*.pyc
+
+# ── Test artefacts ────────────────────────────────────────────────────────────
+test_*.py
+smoke_test.py
+flight_data_validation_test.py
+*.bundle
+htmlcov/
+.coverage
+.pytest_cache/
+
+# ── Deployment & ops clutter ──────────────────────────────────────────────────
+00_SYSTEM_HEALTH_CHECK.txt
+COPY_PASTE_COMMANDS.txt
+DEPLOY_NOW.txt
+DEPLOYMENT_CHECKLIST.txt
+DEPLOYMENT_GUIDE.txt
+DEPLOYMENT_READY.txt
+HEALTH_CHECK_REPORT.md
+QUICK_DEPLOY.txt
+QUICK_REFERENCE.md
+README_VALIDATION.txt
+SETUP_AND_RUN.md
+SETUP.md
+STARTUP_GUIDE.md
+SYSTEM_STATUS.txt
+RUN_BACKEND.bat
+backup-database.sh
+deploy.sh
+test_brightdata_docker.sh
+test_chromium.py
+test_flight_search.py
+travel-crm-backend.service
+travel-crm-backup.bundle
+travel-crm-migration.bundle
+setup_database.py
+
+# ── Internal audit reports (backend) ─────────────────────────────────────────
+fastapi-backend/fastapi-backend/AUDIT_REPORT.txt
+fastapi-backend/fastapi-backend/FINAL_SUMMARY.txt
+fastapi-backend/fastapi-backend/IMPLEMENTATION_ROADMAP.txt
+fastapi-backend/fastapi-backend/flight_data_validation_test.py
+fastapi-backend/fastapi-backend/smoke_test.py
+
+# ── IDE & OS ──────────────────────────────────────────────────────────────────
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+desktop.ini

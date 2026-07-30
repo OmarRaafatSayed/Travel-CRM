@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # FastAPI Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: travel-crm-backend
+    ports:
+      - "8000:8000"
+    environment:
+      # Application Environment
+      - ENVIRONMENT=production
+      
+      # Supabase Configuration
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      - SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - SUPABASE_JWT_SECRET=${SUPABASE_JWT_SECRET}
+      
+      # JWT Configuration
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - JWT_ALGORITHM=HS256
+      
+      # CORS Configuration - Allow both localhost ports for development
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:4000,http://localhost:5173}
+      
+      # API Configuration
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      
+      # Flight Scraping Configuration
+      - FLIGHT_CACHE_TTL_HOURS=12
+      - USE_REMOTE_BROWSER=true
+      
+      # Bright Data Cloud Browser Credentials
+      - BRIGHTDATA_CUSTOMER_ID=${BRIGHTDATA_CUSTOMER_ID}
+      - BRIGHTDATA_ZONE=${BRIGHTDATA_ZONE}
+      - BRIGHTDATA_PASSWORD=${BRIGHTDATA_PASSWORD}
+      
+      # Playwright Configuration (skip local browser download)
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+      
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  logs:

@@ -1,0 +1,50 @@
+# Node modules
+node_modules/
+npm-debug.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv/
+env/
+
+# Environment files (must be passed as env vars)
+.env
+.env.*
+*.env
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
+
+# Tests
+tests/
+.pytest_cache/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Documentation
+*.md
+!fastapi-backend/README.md
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore

@@ -1,0 +1,39 @@
+# FastAPI Travel Agency Backend - Python Dependencies
+# ========================================================
+
+# Core Framework
+fastapi==0.115.0
+uvicorn[standard]==0.34.0
+python-multipart==0.0.18
+pydantic==2.10.4
+pydantic-settings==2.7.0
+
+# Database & Authentication
+supabase>=2.7.0
+psycopg2-binary==2.9.10
+
+# Security & JWT
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+
+# Flight Data Scraping - Network Interception Engine
+# Zero-cost, permanent solution using API response interception
+playwright>=1.50.0  # Network interception via CDP
+playwright-stealth>=0.2.0  # Stealth bypass for bot detection
+selenium>=4.28.1  # Fallback option
+seleniumbase>=4.35.3  # UC Mode fallback
+undetected-chromedriver>=3.5.5  # Additional stealth layer
+
+# Document & File Processing
+pandas==2.2.3
+openpyxl==3.1.5
+python-docx==1.1.2
+xlrd==2.0.1
+
+# HTTP & Async
+httpx==0.28.1
+aiofiles==24.1.0
+
+# Environment & Utilities
+python-dotenv==1.0.1
+python-dateutil==2.9.0
