@@ -1,5 +1,6 @@
-# FastAPI Travel Agency Backend - Python Dependencies
-# ========================================================
+# FastAPI Travel Agency Backend — Production Dependencies
+# Playwright/Selenium removed: flight scraping uses remote Bright Data browser
+# Install locally with: pip install playwright seleniumbase if needed for dev
 
 # Core Framework
 fastapi==0.115.0
@@ -15,14 +16,6 @@ psycopg2-binary==2.9.10
 # Security & JWT
 python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
-
-# Flight Data Scraping - Network Interception Engine
-# Zero-cost, permanent solution using API response interception
-playwright>=1.50.0  # Network interception via CDP
-playwright-stealth>=0.2.0  # Stealth bypass for bot detection
-selenium>=4.28.1  # Fallback option
-seleniumbase>=4.35.3  # UC Mode fallback
-undetected-chromedriver>=3.5.5  # Additional stealth layer
 
 # Document & File Processing
 pandas==2.2.3
