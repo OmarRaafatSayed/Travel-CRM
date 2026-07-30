@@ -93,27 +93,47 @@ async def signup(
 
         try:
             profile_data = {
-                "user_id": user_id,
-                "email": request.email,
+                "user_id":    user_id,
+                "email":      request.email,
                 "first_name": request.first_name,
-                "last_name": request.last_name,
-                "role": "user",
-                "organization_id": organization_id,
+                "last_name":  request.last_name,
+                "role":       "user",
                 "created_at": datetime.utcnow().isoformat(),
                 "updated_at": datetime.utcnow().isoformat(),
             }
+            # Include organization_id only if the column exists (non-fatal either way)
+            if organization_id:
+                profile_data["organization_id"] = organization_id
             supabase.table("profiles").insert(profile_data).execute()
-            print(f"✅ Profile created with organisation_id: {organization_id}")
+            print(f"✅ Profile created for user: {user_id}")
         except Exception as profile_error:
             # Non-fatal — auth user was created; profile can be backfilled
             print(f"⚠️  Profile creation warning: {profile_error}")
 
+        # Auto-login after signup so the frontend gets a usable session
+        session_data = None
+        try:
+            login_response = supabase.auth.sign_in_with_password({
+                "email": request.email,
+                "password": request.password,
+            })
+            if login_response.session:
+                session_data = {
+                    "access_token":  login_response.session.access_token,
+                    "refresh_token": login_response.session.refresh_token,
+                }
+        except Exception:
+            pass  # session optional — frontend can ask user to log in manually
+
         return {
             "success": True,
-            "user_id": user_id,
-            "email": request.email,
+            "user": {
+                "id":    str(user_id),
+                "email": request.email,
+            },
+            "session":         session_data,
             "organization_id": organization_id,
-            "message": "Signup successful. Check your email for confirmation.",
+            "message":         "Signup successful.",
         }
 
     except HTTPException:

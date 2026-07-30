@@ -96,6 +96,80 @@ export interface HotelDataRecord {
   cancellation_policy?: string;
 }
 
+export interface VisaApplicationCreate {
+  client_name: string;
+  passport_number: string;
+  destination_country: string;
+  email?: string;
+  phone?: string;
+  visa_type?: string;
+  application_notes?: string;
+  status?: number;
+  appointment_date?: string;
+  appointment_notes?: string;
+}
+
+export interface VisaApplication {
+  id: string;
+  client_name: string;
+  passport_number: string;
+  destination_country: string;
+  status: number;
+  status_name?: string;
+  email?: string;
+  phone?: string;
+  visa_type?: string;
+  application_notes?: string;
+  appointment_date?: string;
+  appointment_notes?: string;
+  organization_id?: string;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface VisaSearchResponse {
+  results: VisaApplication[];
+  count: number;
+  filters_applied: Record<string, any>;
+}
+
+// ── Payment types ─────────────────────────────────────────────────────────────
+
+export type PaymentStatus = 'pending' | 'partial' | 'full' | 'refunded' | 'cancelled';
+export type PaymentMethod = 'cash' | 'bank' | 'pos' | 'cheque';
+
+export interface PaymentCreate {
+  client_name: string;
+  booking_reference?: string;
+  amount: number;
+  payment_method: PaymentMethod;
+  status?: PaymentStatus;
+  payment_date?: string;
+  notes?: string;
+}
+
+export interface PaymentRecord {
+  id: string;
+  client_name: string;
+  booking_reference?: string;
+  amount: number;
+  payment_method: PaymentMethod;
+  status: PaymentStatus;
+  payment_date?: string;
+  notes?: string;
+  organization_id?: string;
+  created_by?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface PaymentSearchResponse {
+  results: PaymentRecord[];
+  count: number;
+  filters_applied: Record<string, any>;
+}
+
 export interface DocumentParseResponse {
   success: boolean;
   file_name: string;
@@ -165,15 +239,21 @@ class FastAPIClient {
         const errorData = await response.json().catch(() => ({}));
 
         if (response.status === 401) {
-          throw new Error(
-            'Session expired or invalid. Please log in again.',
-          );
+          throw new Error('Session expired or invalid. Please log in again.');
         }
 
-        throw new Error(
-          (errorData as { detail?: string }).detail ??
-          `API request failed: ${response.status} ${response.statusText}`,
-        );
+        // detail may be a string OR a nested object (e.g. from 503 flight errors)
+        const detail = (errorData as any).detail;
+        const message =
+          typeof detail === 'string'
+            ? detail
+            : typeof detail?.error === 'string'
+              ? detail.error
+              : detail
+                ? JSON.stringify(detail)
+                : `API request failed: ${response.status} ${response.statusText}`;
+
+        throw new Error(message);
       }
 
       return (await response.json()) as T;
@@ -296,6 +376,150 @@ class FastAPIClient {
     return this.request(`/hotels/search?${queryParams.toString()}`, {
       method: 'GET',
     });
+  }
+
+  /** 🔒 Protected */
+  async deleteHotel(hotelId: string): Promise<unknown> {
+    return this.request(`/hotels/offers/${hotelId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  // ── Visa Application endpoints ──────────────────────────────────────────────
+
+  /** 🔒 Protected */
+  async createVisaApplication(data: VisaApplicationCreate): Promise<VisaApplication> {
+    return this.request<VisaApplication>('/visa/applications', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /** 🔒 Protected */
+  async searchVisaApplications(filters: {
+    client_name?: string;
+    passport_number?: string;
+    destination_country?: string;
+    status?: number;
+    limit?: number;
+    offset?: number;
+  }): Promise<VisaSearchResponse> {
+    const queryParams = new URLSearchParams();
+
+    for (const [key, value] of Object.entries(filters)) {
+      if (value !== undefined && value !== null) {
+        queryParams.append(key, String(value));
+      }
+    }
+
+    return this.request<VisaSearchResponse>(
+      `/visa/applications?${queryParams.toString()}`,
+      { method: 'GET' }
+    );
+  }
+
+  /** 🔒 Protected */
+  async getVisaApplication(applicationId: string): Promise<VisaApplication> {
+    return this.request<VisaApplication>(`/visa/applications/${applicationId}`, {
+      method: 'GET',
+    });
+  }
+
+  /** 🔒 Protected */
+  async updateVisaApplication(
+    applicationId: string,
+    updates: Partial<VisaApplicationCreate>
+  ): Promise<VisaApplication> {
+    return this.request<VisaApplication>(`/visa/applications/${applicationId}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+  }
+
+  /** 🔒 Protected */
+  async updateVisaStatus(
+    applicationId: string,
+    newStatus: number
+  ): Promise<{ success: boolean; new_status: number; status_name: string }> {
+    return this.request(`/visa/applications/${applicationId}/status?new_status=${newStatus}`, {
+      method: 'PATCH',
+    });
+  }
+
+  /** 🔒 Protected */
+  async updateVisaAppointment(
+    applicationId: string,
+    appointmentDate: string,
+    notes?: string
+  ): Promise<{ success: boolean }> {
+    const params = new URLSearchParams({ appointment_date: appointmentDate });
+    if (notes) params.append('appointment_notes', notes);
+
+    return this.request(`/visa/applications/${applicationId}/appointment?${params.toString()}`, {
+      method: 'PATCH',
+    });
+  }
+
+  /** 🔒 Protected */
+  async deleteVisaApplication(applicationId: string): Promise<{ success: boolean }> {
+    return this.request(`/visa/applications/${applicationId}`, {
+      method: 'DELETE',
+    });
+  }
+
+  /** 🔒 Protected */
+  async getVisaStatusSummary(): Promise<{
+    total: number;
+    by_status: Record<string, number>;
+    status_counts: Record<number, number>;
+  }> {
+    return this.request('/visa/status-summary', { method: 'GET' });
+  }
+
+  // ── Payment endpoints ───────────────────────────────────────────────────────
+
+  /** 🔒 Protected */
+  async createPayment(data: PaymentCreate): Promise<PaymentRecord> {
+    return this.request<PaymentRecord>('/payments', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  /** 🔒 Protected */
+  async searchPayments(filters: {
+    client_name?: string;
+    booking_reference?: string;
+    status?: string;
+    payment_method?: string;
+    date_from?: string;
+    date_to?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<PaymentSearchResponse> {
+    const q = new URLSearchParams();
+    for (const [k, v] of Object.entries(filters)) {
+      if (v !== undefined && v !== null && v !== '') q.append(k, String(v));
+    }
+    return this.request<PaymentSearchResponse>(`/payments?${q.toString()}`, { method: 'GET' });
+  }
+
+  /** 🔒 Protected */
+  async getPaymentsSummary(): Promise<{ total: number; by_status: Record<string, number> }> {
+    return this.request('/payments/summary', { method: 'GET' });
+  }
+
+  /** 🔒 Protected */
+  async updatePayment(id: string, updates: Partial<PaymentCreate>): Promise<PaymentRecord> {
+    return this.request<PaymentRecord>(`/payments/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(updates),
+    });
+  }
+
+  /** 🔒 Protected */
+  async deletePayment(id: string): Promise<{ success: boolean }> {
+    return this.request(`/payments/${id}`, { method: 'DELETE' });
   }
 
   // ── Health (public) ─────────────────────────────────────────────────────────

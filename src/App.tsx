@@ -26,6 +26,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './com
 import { Button } from './components/ui/button'
 import { Input } from './components/ui/input'
 import { Label } from './components/ui/label'
+import { Toaster } from './components/ui/toaster'
 import { FlightSearch } from './components/FlightSearch'
 import { HotelManagement } from './components/HotelManagement-simple'
 import { VisaManagement } from './components/VisaManagement-simple'
@@ -34,7 +35,7 @@ import { DesktopSidebar, MobileTabBar, MobileDrawer, NAV_IDS } from './component
 import { LangToggle } from './components/LangToggle'
 import {
   Plane, Hotel, FileText, CreditCard,
-  LogIn, UserPlus, Users, ChevronRight, Loader2,
+  LogIn, UserPlus, Users, ChevronRight, Loader2, Eye, EyeOff,
 } from 'lucide-react'
 import {
   setSupabaseSession,
@@ -82,6 +83,7 @@ function App() {
   const [drawerOpen,       setDrawerOpen]        = useState(false)
   const [authError,        setAuthError]         = useState<string | null>(null)
   const [isSubmitting,     setIsSubmitting]      = useState(false)
+  const [showPassword,     setShowPassword]      = useState(false)
   const [formData, setFormData] = useState({
     email: '', password: '', firstName: '', lastName: '',
   })
@@ -135,6 +137,13 @@ function App() {
 
       if (!res.ok || !data.success) {
         setAuthError(data.detail ?? t('auth.authFailed'))
+        return
+      }
+
+      // Signup may return null session if Supabase email confirmation is enabled.
+      // In that case, tell the user to check their email instead of crashing.
+      if (!data.session?.access_token) {
+        setAuthError(isLogin ? t('auth.authFailed') : t('auth.checkEmail'))
         return
       }
 
@@ -263,15 +272,30 @@ function App() {
 
               <div className="space-y-1">
                 <Label htmlFor="password">{t('auth.password')}</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder={t('auth.passwordPlaceholder')}
-                  value={formData.password}
-                  onChange={setField('password')}
-                  disabled={isSubmitting}
-                  required
-                />
+                <div className="relative">
+                  <Input
+                    id="password"
+                    type={showPassword ? 'text' : 'password'}
+                    placeholder={t('auth.passwordPlaceholder')}
+                    value={formData.password}
+                    onChange={setField('password')}
+                    disabled={isSubmitting}
+                    required
+                    className="pe-10"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(v => !v)}
+                    className="absolute end-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                    tabIndex={-1}
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword
+                      ? <EyeOff className="h-4 w-4" />
+                      : <Eye    className="h-4 w-4" />
+                    }
+                  </button>
+                </div>
               </div>
 
               {/* Error message — replaces the blocking alert() */}
@@ -404,6 +428,9 @@ function App() {
         email={displayEmail}
         onSignOut={handleLogout}
       />
+
+      {/* Toast notifications */}
+      <Toaster />
     </>
   )
 }

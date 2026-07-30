@@ -493,63 +493,10 @@ export function VisaManagement() {
                         </TableCell>
                         <TableCell className="font-mono text-sm">{app.passport_number}</TableCell>
                         <TableCell>{app.destination_country}</TableCell>
-                        <TableCell onClick={(e) => e.stopPropagation()}>
-                          <Select
-                            value={String(app.status)}
-                            onValueChange={async (val) => {
-                              const newStatus = parseInt(val);
-                              if (newStatus === app.status) return;
-                              
-                              setStatusUpdatingId(app.id);
-                              try {
-                                await apiClient.updateVisaStatus(app.id, newStatus);
-                                toast({ 
-                                  title: t('visa.toastStatusUpdated'), 
-                                  description: `${t('visa.toastStatusMovedTo', { step: newStatus, label: t(`visa.${VISA_STATUS_KEYS[newStatus - 1]}`) })}` 
-                                });
-                                await loadApplications();
-                                await loadSummary();
-                              } catch (err) {
-                                toast({ 
-                                  title: t('visa.toastError'), 
-                                  description: err instanceof Error ? err.message : t('visa.toastStatusError'), 
-                                  variant: 'destructive' 
-                                });
-                              } finally {
-                                setStatusUpdatingId(null);
-                              }
-                            }}
-                            disabled={statusUpdatingId === app.id}
-                          >
-                            <SelectTrigger className="w-[180px] h-8 border-0 shadow-none hover:bg-muted/50 transition-colors">
-                              <SelectValue>
-                                {statusUpdatingId === app.id ? (
-                                  <div className="flex items-center gap-2">
-                                    <Loader2 className="h-3 w-3 animate-spin" />
-                                    <span className="text-xs">{t('visa.updating')}...</span>
-                                  </div>
-                                ) : (
-                                  <Badge className={`${colors.bg} text-white text-xs cursor-pointer hover:opacity-90`}>
-                                    {app.status}. {app.status_name ?? t(`visa.${VISA_STATUS_KEYS[app.status - 1]}`)}
-                                  </Badge>
-                                )}
-                              </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {VISA_STATUS_KEYS.map((key, i) => {
-                                const num = i + 1;
-                                const statusColors = STATUS_COLORS[num];
-                                return (
-                                  <SelectItem key={key} value={String(num)}>
-                                    <div className="flex items-center gap-2">
-                                      <span className={`w-3 h-3 rounded-full ${statusColors.bg}`} />
-                                      <span>{num}. {t(`visa.${key}`)}</span>
-                                    </div>
-                                  </SelectItem>
-                                );
-                              })}
-                            </SelectContent>
-                          </Select>
+                        <TableCell>
+                          <Badge className={`${colors.bg} text-white text-xs`}>
+                            {app.status}. {app.status_name ?? t(`visa.${VISA_STATUS_KEYS[app.status - 1]}`)}
+                          </Badge>
                         </TableCell>
                         <TableCell>
                           {app.appointment_date ? (
@@ -561,32 +508,23 @@ export function VisaManagement() {
                             <span className="text-xs text-muted-foreground">{t('visa.noAppointment')}</span>
                           )}
                         </TableCell>
-                        <TableCell className="text-end" onClick={(e) => e.stopPropagation()}>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end" className="w-48">
-                              <DropdownMenuItem onClick={() => openAppointmentDialog(app)}>
-                                <Calendar className="me-2 h-4 w-4" />
-                                {t('visa.scheduleAppt')}
-                              </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => setSelectedId(app.id)}>
-                                <Edit className="me-2 h-4 w-4" />
-                                {t('visa.viewDetails')}
-                              </DropdownMenuItem>
-                              <DropdownMenuSeparator />
-                              <DropdownMenuItem 
-                                onClick={() => handleDeleteApplication(app)}
-                                className="text-red-600 focus:text-red-600"
-                              >
-                                <Trash2 className="me-2 h-4 w-4" />
-                                {t('visa.tooltipDelete')}
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                        <TableCell className="text-end">
+                          <div className="flex justify-end gap-1">
+                            <Button
+                              variant="ghost" size="sm"
+                              title={t('visa.tooltipSchedule')}
+                              onClick={(e) => { e.stopPropagation(); openAppointmentDialog(app); }}
+                            >
+                              <Clock className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="ghost" size="sm"
+                              title={t('visa.tooltipDelete')}
+                              onClick={(e) => { e.stopPropagation(); handleDeleteApplication(app); }}
+                            >
+                              <Trash2 className="h-4 w-4 text-red-500" />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     );

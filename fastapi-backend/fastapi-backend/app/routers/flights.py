@@ -79,20 +79,19 @@ async def search_flights(
     )
 
     if not result.get("success"):
+        # Return a structured 200 response instead of raising an HTTP exception.
+        # The frontend already handles success=False gracefully — no need for
+        # a 503/500 that causes error object serialisation issues.
         error_type = result.get("error_type", "unknown_error")
-        detail: Dict[str, Any] = {
-            "error": result.get("error", "Flight search failed"),
-            "type": error_type,
-        }
 
         if error_type == "all_methods_failed":
-            detail["remediation"] = (
-                "Install local Chromium: playwright install chromium  "
-                "OR configure Bright Data credentials in .env"
+            result["error"] = (
+                "Flight search is unavailable: the scraper requires Playwright/Chromium "
+                "or Bright Data credentials. Contact your administrator."
             )
-            raise HTTPException(status_code=503, detail=detail)
 
-        raise HTTPException(status_code=500, detail=detail)
+        result["requested_by"] = token.user_id
+        return result
 
     # Attach requesting user context to the result for audit / data isolation
     result["requested_by"] = token.user_id

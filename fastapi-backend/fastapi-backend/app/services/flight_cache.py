@@ -28,9 +28,9 @@ async def get_cached_results(
         Cached results dict or None if not found/expired
     """
     try:
-        from app.services.supabase_client import get_supabase_client
+        from app.services.supabase_client import get_supabase
         
-        supabase = get_supabase_client()
+        supabase = get_supabase()
         cache_key = _build_cache_key(origin, destination, departure_date, return_date)
         
         # Query cache table
@@ -78,9 +78,9 @@ async def cache_results(
         results: Flight search results to cache
     """
     try:
-        from app.services.supabase_client import get_supabase_client
+        from app.services.supabase_client import get_supabase
         
-        supabase = get_supabase_client()
+        supabase = get_supabase()
         cache_key = _build_cache_key(origin, destination, departure_date, return_date)
         
         # Calculate expiry
@@ -123,9 +123,9 @@ async def clear_expired_cache():
     Should be called periodically via cron job or startup task
     """
     try:
-        from app.services.supabase_client import get_supabase_client
+        from app.services.supabase_client import get_supabase
         
-        supabase = get_supabase_client()
+        supabase = get_supabase()
         
         # Delete expired entries
         result = supabase.table('flight_search_cache').delete().lt(

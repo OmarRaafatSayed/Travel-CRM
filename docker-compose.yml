@@ -39,8 +39,9 @@ services:
       - BRIGHTDATA_ZONE=${BRIGHTDATA_ZONE}
       - BRIGHTDATA_PASSWORD=${BRIGHTDATA_PASSWORD}
       
-      # Playwright Configuration (skip local browser download)
-      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+      # Playwright — browser IS installed in image
+      - PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=0
+      - USE_REMOTE_BROWSER=false
       
     volumes:
       - ./logs:/app/logs

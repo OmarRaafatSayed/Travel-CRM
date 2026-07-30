@@ -84,6 +84,7 @@ export function FlightSearch() {
         travel_class:     formData.travelClass,
       };
       const results = await apiClient.searchFlights(params);
+      console.log('[FlightSearch] API response:', results);
       setSearchResults(results);
 
       if (results.success && results.flights.length > 0) {
